@@ -44,3 +44,20 @@ print('Now get the current status:',stm_memory.get("status"))
 stm_memory.clear()
 
 print('All the Memory got cleared now:',stm_memory.memory)
+
+from storage.base_storage import BaseStorage
+
+print("BaseStorage imported successfully")
+
+from config.settings import DATABASE_PATH
+
+print(DATABASE_PATH)
+
+from storage.sqlite_storage import SQLiteStorage
+
+
+storage = SQLiteStorage()
+
+storage.initialize()
+
+print("SQLite Storage initialized successfully")
