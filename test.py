@@ -60,4 +60,21 @@ storage = SQLiteStorage()
 
 storage.initialize()
 
-print("SQLite Storage initialized successfully")
+
+memory = {
+    "user_id": "senthil",
+    "memory_key": "skills",
+    "memory_value": {
+        "languages": [
+            "Python",
+            "SQL",
+            "PyTorch"
+        ]
+    },
+    "memory_type": "skill",
+    "importance": 9
+}
+
+storage_id = storage.save(memory)
+
+print("Memory saved successfully! storage_id:",storage_id)
