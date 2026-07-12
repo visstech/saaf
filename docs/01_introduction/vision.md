@@ -257,3 +257,17 @@ Project:
 
 Repository:
 https://github.com/visstech/saaf
+
+# Project Information
+
+| Field | Details |
+|---|---|
+| Project Name | SAAF |
+| Full Name | Simple AI Agent Framework |
+| Category | Open Source AI Agent Engineering Framework |
+| Developed By | Vi.S.Senthil Kumar |
+| Organization | Visstech |
+| License | To be decided |
+| Repository | GitHub: visstech/saaf |
+| First Release | v0.1.0 |
+| Current Version | v0.2.0 |
