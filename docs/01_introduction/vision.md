@@ -3,8 +3,34 @@
 ## Simple AI Agent Framework
 
 Version: 0.3.0  
-Status: Vision Document  
-Author: SAAF Community  
+Document Status: Vision Document  
+
+---
+
+## Project Information
+
+| Field | Details |
+|---|---|
+| Project Name | SAAF |
+| Full Name | Simple AI Agent Framework |
+| Category | Open Source AI Agent Engineering Framework |
+| Developed By | Vi.S.Senthil Kumar (Founder & Lead Developer)
+| Organization | Visstech |
+| Repository | https://github.com/visstech/saaf |
+| Initial Release | v0.1.0 |
+| Current Release | v0.2.0 |
+  Maintained By | SAAF Community
+
+---
+
+## About This Document
+
+This document defines the vision, mission, philosophy, and long-term goals of SAAF.
+
+It explains why SAAF exists, who it is designed for, and the principles that guide its development.
+
+---
+
 
 ---
 
@@ -239,35 +265,5 @@ The goal is to understand how intelligent systems are built.
 **SAAF - Simple AI Agent Framework**
 
 Learn. Build. Understand AI Agents.
+ 
 
-Author: SAAF Community
-
-# SAAF Vision
-
-## Simple AI Agent Framework
-
-Version: 0.3.0  
-Status: Vision Document  
-
-Developed by:
-**Vi.S.Senthil Kumar (Visstech)**
-
-Project:
-**SAAF - Simple AI Agent Framework**
-
-Repository:
-https://github.com/visstech/saaf
-
-# Project Information
-
-| Field | Details |
-|---|---|
-| Project Name | SAAF |
-| Full Name | Simple AI Agent Framework |
-| Category | Open Source AI Agent Engineering Framework |
-| Developed By | Vi.S.Senthil Kumar |
-| Organization | Visstech |
-| License | To be decided |
-| Repository | GitHub: visstech/saaf |
-| First Release | v0.1.0 |
-| Current Version | v0.2.0 |
