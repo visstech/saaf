@@ -1,5 +1,7 @@
 from memory.conversation_memory import ConversationMemory
 from memory.short_term_memory import ShortTermMemory
+from memory.long_term_memory import LongTermMemory
+from memory.memory_manager import MemoryManager
 
 memory = ConversationMemory()
 
@@ -78,3 +80,80 @@ memory = {
 storage_id = storage.save(memory)
 
 print("Memory saved successfully! storage_id:",storage_id)
+
+memory = storage.get(
+    "senthil",
+    "skills"
+)
+
+print(memory)
+
+# storage.update({
+#     "user_id":"senthil",
+#     "memory_key":"unknown",
+#     "memory_value":{},
+#     "memory_type":"test",
+#     "importance":1
+# })
+
+# storage.delete(
+#     "senthil",
+#     "skills"
+# )
+
+ 
+
+long_term_memory = LongTermMemory(storage)
+
+
+memory = {
+    "user_id": "senthil",
+    "memory_key": "favorite_language",
+    "memory_value": {
+        "language": "Python"
+    },
+    "memory_type": "preference",
+    "importance": 10
+}
+
+
+long_term_memory.store(memory)
+print('Using Long_term_memory:')
+result = long_term_memory.recall(
+    "senthil",
+    "favorite_language"
+)
+
+print('Recalled from Lange term Memory:',result)
+
+result = long_term_memory.forget("senthil",
+                            "favorite_language")
+
+if result :
+    print('Memory Removed.')
+
+print('Trying to recall after removed.')
+result = long_term_memory.recall(
+    "senthil",
+    "favorite_language"
+)
+if result is None:
+    print('Memory Key Not found.')
+    
+
+long_term_memory = LongTermMemory(
+    storage
+)
+
+
+manager = MemoryManager(
+    conversation_memory=None,
+    short_term_memory=None,
+    long_term_memory=long_term_memory
+)
+
+
+print("MemoryManager created successfully")
+
+
+)

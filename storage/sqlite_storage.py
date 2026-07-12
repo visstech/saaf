@@ -1,6 +1,6 @@
 import json
 import sqlite3
-
+from models.memory import Memory
 from storage.base_storage import BaseStorage
 from config.settings import DATABASE_PATH
 
@@ -59,7 +59,7 @@ class SQLiteStorage(BaseStorage):
         
         
 
-    def save(self, memory):
+    def save(self, memory: Memory):
         """
         Insert new memory or update existing memory.
         """
@@ -73,7 +73,8 @@ class SQLiteStorage(BaseStorage):
         ]
 
         for field in required_fields:
-            if field not in memory:
+            value = getattr(memory, field)
+            if value is None:
                 raise ValueError(
                     f"{field} is missing."
                 )
@@ -93,8 +94,8 @@ class SQLiteStorage(BaseStorage):
         cursor.execute(
             check_query,
             (
-                memory["user_id"],
-                memory["memory_key"]
+                memory.user_id,
+                memory.memory_key
             )
         )
 
@@ -103,8 +104,8 @@ class SQLiteStorage(BaseStorage):
 
 
         json_value = json.dumps(
-            memory["memory_value"]
-        )
+                memory.memory_value
+                                )
 
 
         if existing:
@@ -125,8 +126,8 @@ class SQLiteStorage(BaseStorage):
                 update_query,
                 (
                     json_value,
-                    memory["memory_type"],
-                    memory["importance"],
+                    memory.memory_type,
+                    memory.importance,
                     existing[0]
                 )
             )
@@ -151,11 +152,11 @@ class SQLiteStorage(BaseStorage):
             cursor.execute(
                 insert_query,
                 (
-                    memory["user_id"],
-                    memory["memory_key"],
+                    memory.user_id,
+                    memory.memory_key,
                     json_value,
-                    memory["memory_type"],
-                    memory["importance"]
+                    memory.memory_type,
+                    memory.importance
                 )
             )
 
@@ -165,13 +166,181 @@ class SQLiteStorage(BaseStorage):
         return cursor.lastrowid
 
 
-    def get(self, *args, **kwargs):
-        pass
+    def get(self,user_id: str,memory_key: str) -> Memory | None:
+        """
+        Retrieve memory from SQLite.
+        """
+
+        query = """
+        SELECT
+            user_id,
+            memory_key,
+            memory_value,
+            memory_type,
+            importance,
+            created_at,
+            updated_at
+
+        FROM memories
+
+        WHERE user_id = ?
+        AND memory_key = ?
+        """
+
+        cursor = self.connection.cursor()
+
+        cursor.execute(
+            query,
+            (
+                user_id,
+                memory_key
+            )
+        )
+
+        result = cursor.fetchone()
 
 
-    def update(self, *args, **kwargs):
-        pass
+        if result is None:
+            return None
 
 
-    def delete(self, *args, **kwargs):
-        pass
+        return Memory(
+                    user_id=result[0],
+                    memory_key=result[1],
+                    memory_value=json.loads(result[2]),
+                    memory_type=result[3],
+                    importance=result[4]
+                    )
+
+
+    def update(self, memory: Memory) -> bool:
+        """
+        Update an existing memory.
+        """
+
+        required_fields = [
+            "user_id",
+            "memory_key",
+            "memory_value",
+            "memory_type",
+            "importance"
+        ]
+
+        for field in required_fields:
+            value = getattr(memory, field)
+            if value is None:
+                raise ValueError(
+                    f"{field} is missing."
+                )
+
+
+        check_query = """
+        SELECT id
+        FROM memories
+        WHERE user_id = ?
+        AND memory_key = ?
+        """
+
+
+        cursor = self.connection.cursor()
+
+        cursor.execute(
+            check_query,
+            (
+                memory.user_id,
+                memory.memory_key
+            )
+        )
+
+
+        result = cursor.fetchone()
+
+
+        if result is None:
+            raise ValueError(
+                "Memory does not exist."
+            )
+
+
+        update_query = """
+        UPDATE memories
+
+        SET memory_value = ?,
+            memory_type = ?,
+            importance = ?,
+            updated_at = CURRENT_TIMESTAMP
+
+        WHERE user_id = ?
+        AND memory_key = ?
+        """
+
+
+        cursor.execute(
+            update_query,
+            (
+                json.dumps(memory.memory_value),
+                memory.memory_type,
+                memory.importance,
+                memory.user_id,
+                memory.memory_key
+            )
+        )
+
+
+        self.connection.commit()
+
+
+        return True
+
+
+    def delete(self,user_id: str,memory_key: str) -> bool:
+        """
+        Delete an existing memory.
+        """
+
+        check_query = """
+        SELECT id
+        FROM memories
+        WHERE user_id = ?
+        AND memory_key = ?
+        """
+
+        cursor = self.connection.cursor()
+
+        cursor.execute(
+            check_query,
+            (
+                user_id,
+                memory_key
+            )
+        )
+
+        result = cursor.fetchone()
+
+
+        if result is None:
+            raise ValueError(
+                "Memory does not exist."
+            )
+
+
+        delete_query = """
+        DELETE FROM memories
+        WHERE user_id = ?
+        AND memory_key = ?
+        """
+
+
+        cursor.execute(
+            delete_query,
+            (
+                user_id,
+                memory_key
+            )
+        )
+
+
+        self.connection.commit()
+
+
+        return True
