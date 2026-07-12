@@ -37,3 +37,14 @@ SAAF follows clean software architecture principles:
 - Separation of Concerns
 - Modular Design
 - Storage Independence
+
+
+# SAAF
+## Simple AI Agent Framework
+
+An open-source AI Agent Engineering framework
+designed to help developers learn, build,
+and understand intelligent agent systems.
+
+Developed by:
+Vi.S.Senthil Kumar
