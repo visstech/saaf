@@ -1,7 +1,9 @@
 # SAAF
 ## Simple AI Agent Framework
 
-SAAF is a modular AI Agent framework built from scratch.
+An open-source AI Agent Engineering framework.
+
+Learn. Build. Understand AI Agents.
 
 ## Vision
 
