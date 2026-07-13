@@ -1,4 +1,4 @@
-# 🤖 SAAF
+# SAAF
 
 # Simple AI Agent Framework
 
