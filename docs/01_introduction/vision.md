@@ -125,23 +125,19 @@ A developer should be able to read the source code and understand the architectu
 
 ## 6.2 Modularity
 
-Every component should be independent and replaceable.
+SAAF is designed with a modular architecture where each capability is organized as an independent component.
 
-Example:
+Each module should have a clear responsibility and communicate through well-defined interfaces.
 
-Memory
+This approach allows developers to:
 
-Application
-|
-|
-Memory Interface
-|
-┌───┼────┐
-| |
-SQLite PostgreSQL
+- Understand individual components easily
+- Extend existing capabilities
+- Replace implementations when needed
+- Build new features without changing the entire framework
 
+Modularity enables SAAF to grow continuously while keeping the framework simple and maintainable.
 
----
 
 ## 6.3 Transparency
 
