@@ -2,27 +2,6 @@
 
 ## Simple AI Agent Framework
 
-Version: 0.3.0  
-Document Status: Architecture Document  
-
----
-
-## Project Information
-
-| Field | Details |
-|---|---|
-| Project Name | SAAF |
-| Full Name | Simple AI Agent Framework |
-| Developed By | Vi.S.Senthil Kumar (Founder & Lead Developer) |
-| Organization | Visstech |
-| Repository | https://github.com/visstech/saaf |
-
----
-
-# SAAF Architecture
-
-## Simple AI Agent Framework
-
 Version: 0.3.0
 Document Status: Architecture Specification
 
@@ -35,7 +14,7 @@ Document Status: Architecture Specification
 | Project Name | SAAF                                       |
 | Full Name    | Simple AI Agent Framework                  |
 | Category     | Open Source AI Agent Engineering Framework |
-| Developed By | Senthil Kumar (Founder & Lead Developer)   |
+| Developed By | Vi.S.Senthil Kumar (Founder & Lead Developer)   |
 | Organization | Visstech                                   |
 | Repository   | https://github.com/visstech/saaf           |
 
