@@ -1,5 +1,5 @@
-from models.memory import Memory
-from storage.base_storage import BaseStorage
+from saaf.models.memory import Memory
+from saaf.storage.base_storage import BaseStorage
 
 
 

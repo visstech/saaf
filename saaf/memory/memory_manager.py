@@ -1,4 +1,4 @@
-from models.memory import Memory
+from saaf.models.memory import Memory
 from typing import Any
 
 class MemoryManager:

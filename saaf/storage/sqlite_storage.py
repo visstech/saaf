@@ -1,8 +1,8 @@
 import json
 import sqlite3
-from models.memory import Memory
-from storage.base_storage import BaseStorage
-from config.settings import DATABASE_PATH
+from saaf.models.memory import Memory
+from saaf.storage.base_storage import BaseStorage
+from saaf.config.settings import DATABASE_PATH
 
 
 class SQLiteStorage(BaseStorage):

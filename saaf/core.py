@@ -1,9 +1,8 @@
-from storage.sqlite_storage import SQLiteStorage
-
-from memory.conversation_memory import ConversationMemory
-from memory.short_term_memory import ShortTermMemory
-from memory.long_term_memory import LongTermMemory
-from memory.memory_manager import MemoryManager
+from saaf.storage.sqlite_storage import SQLiteStorage
+from saaf.memory.conversation_memory import ConversationMemory
+from saaf.memory.short_term_memory import ShortTermMemory
+from saaf.memory.long_term_memory import LongTermMemory
+from saaf.memory.memory_manager import MemoryManager
 
 
 class SAAF:
