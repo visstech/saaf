@@ -44,3 +44,28 @@ class ToolManager:
             raise ValueError(f"Tool '{tool_name}' not found.")
 
         return tool.execute(query)
+    
+    def execute_plan(self, plan: dict):
+        """
+        Execute a reasoning plan.
+
+        Example plan:
+
+        {
+            "tool": "calculator",
+            "input": "23*19"
+        }
+        """
+
+        tool_name = plan.get("tool")
+        query = plan.get("input")
+
+        if tool_name is None:
+            raise ValueError(
+                "No tool specified in execution plan."
+            )
+
+        return self.execute_tool(
+            tool_name,
+            query
+        )

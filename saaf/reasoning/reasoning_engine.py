@@ -1,12 +1,18 @@
 class ReasoningEngine:
+    """
+    SAAF Reasoning Engine.
 
-    def think(self, user_request: str):
+    Converts user requests into
+    executable plans.
+    """
 
-        user_request = user_request.lower()
+    def plan(self, user_request: str):
 
-        if "calculate" in user_request:
+        request = user_request.lower()
 
-            expression = user_request.replace(
+        if "calculate" in request:
+
+            expression = request.replace(
                 "calculate",
                 ""
             ).strip()
@@ -16,4 +22,8 @@ class ReasoningEngine:
                 "input": expression
             }
 
-        return None
+
+        return {
+            "tool": None,
+            "input": user_request
+        }
