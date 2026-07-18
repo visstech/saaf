@@ -36,35 +36,85 @@ class ReasoningEngine:
         # Memory Statement
         # -----------------------------
 
-        if "my name is" in request:
+        if "my name" in request and "is" in request:
 
             return {
                 "action": "memory_saved",
                 "memory_key": "name"
             }
 
+        if "i know" in request:
 
+            return {
+                "action": "memory_saved",
+                "memory_key": "skills"
+            }
         # -----------------------------
         # Tool Execution
         # -----------------------------
 
         if "calculate" in request:
 
+
             expression = request.replace(
                 "calculate",
                 ""
-            ).strip()
+            )
 
+
+            # Multi-step workflow
+
+            if "save" in expression:
+
+
+                expression = (
+                    expression
+                    .split("and")[0]
+                    .strip()
+                )
+
+
+                return {
+
+                    "action":"workflow",
+
+                    "steps":[
+
+                        {
+                            "action":"tool",
+
+                            "tool":"calculator",
+
+                            "input":expression
+
+                        },
+
+                        {
+                            "action":"save_memory",
+
+                            "memory_key":
+                            "last_calculation"
+
+                        }
+
+                    ]
+
+                }
+
+
+
+            # Normal calculation
 
             return {
 
-                "action": "tool",
+                "action":"tool",
 
-                "tool": "calculator",
+                "tool":"calculator",
 
-                "input": expression
+                "input":
+                expression.strip()
+
             }
-
 
         # -----------------------------
         # Unknown

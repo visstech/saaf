@@ -2,6 +2,9 @@ from saaf.models.memory import Memory
 from saaf.memory.memory_response import MemoryResponse
 from saaf.response.response_generator import ResponseGenerator
 from saaf.memory.memory_extractor import MemoryExtractor
+from saaf.workflow.state import WorkflowState
+
+
 
 class Agent:
     """
@@ -20,27 +23,34 @@ class Agent:
         reasoning=None,
         tools=None,
         observer=None,
-        memory_extractor=None
+        memory_extractor=None,
+        planner=None,
+        executor=None,
+        workflow=None
     ):
 
         self.name = name
         self.status = "initialized"
 
-        # Core Components
         self.memory = memory
         self.reasoning = reasoning
         self.tools = tools
         self.observer = observer
-        # Response Layer
+        self.workflow = workflow
+
         self.response_generator = ResponseGenerator()
-        self.memory_extractor = MemoryExtractor()
+
+        self.memory_extractor = (
+            memory_extractor
+            or MemoryExtractor()
+        )
+
+        self.planner = planner
+        self.executor = executor
+
+
 
     def run(self, request):
-        """
-        Execute a user request
-        through the SAAF pipeline.
-        """
-
 
         self.status = "running"
 
@@ -49,15 +59,19 @@ class Agent:
             f"[Agent] Request received : {request}"
         )
 
-        # -----------------------------
+
+        # =============================
         # Memory Extraction
-        # -----------------------------
+        # =============================
 
         if self.memory_extractor and self.memory:
 
-            extracted_memory = self.memory_extractor.extract(
-                "default",
-                request
+
+            extracted_memory = (
+                self.memory_extractor.extract(
+                    "default",
+                    request
+                )
             )
 
 
@@ -67,32 +81,40 @@ class Agent:
                     extracted_memory
                 )
 
+
                 print(
-                    "[Memory Extractor] "
-                    "New memory stored."
+                    "[Memory Extractor] New memory stored."
                 )
 
-                # -----------------------------
-                # Observer Layer
-                # -----------------------------
-
-                if self.observer:
-                    print("[Observer] Active")
 
 
+        # =============================
+        # Observer
+        # =============================
 
-        # -----------------------------
+        if self.observer:
+
+            print(
+                "[Observer] Active"
+            )
+
+
+
+        # =============================
         # Memory Layer
-        # -----------------------------
+        # =============================
 
         if self.memory:
-            print("[Memory] Connected")
+
+            print(
+                "[Memory] Connected"
+            )
 
 
 
-        # -----------------------------
-        # Reasoning Layer
-        # -----------------------------
+        # =============================
+        # Reasoning
+        # =============================
 
         if self.reasoning:
 
@@ -117,10 +139,9 @@ class Agent:
 
 
 
-        # -----------------------------
+        # =============================
         # Execute Plan
-        # -----------------------------
-
+        # =============================
 
         if not plan:
 
@@ -137,95 +158,168 @@ class Agent:
                 "action"
             )
 
-            # -----------------------------
+
+
+            # =============================
             # Memory Saved
-            # -----------------------------
+            # =============================
 
             if action == "memory_saved":
+
 
                 result = {
 
                     "message":
-                    "I have remembered that information."
+                    "I have remembered that."
 
                 }
-            
-            
+
+
+
             # =============================
-            # TOOL ACTION
+            # TOOL / WORKFLOW
             # =============================
 
-            if action == "tool" and self.tools:
+            elif action in [
+                "tool",
+                "workflow"
+            ]:
 
 
-                print(
-                    "[Tools] Executing..."
-                )
+                if not self.planner or not self.executor:
+
+                    result = {
+
+                        "message":
+                        "Executor not available."
+
+                    }
 
 
-                result = self.tools.execute_plan(
-                    plan
-                )
+                else:
 
 
-
-                # Save calculation result
-
-                if (
-                    self.memory
-                    and isinstance(result, dict)
-                    and "output" in result
-                ):
-
-
-                    memory = Memory(
-
-                        user_id="default",
-
-                        memory_key="last_calculation",
-
-                        memory_value={
-
-                            "expression":
-                            result["input"],
-
-                            "result":
-                            result["output"]
-
-                        },
-
-                        memory_type="fact",
-
-                        importance=1
+                    print(
+                        "[Planner] Creating execution plan..."
                     )
 
 
-                    self.memory.remember(
-                        memory
+                    execution_plan = (
+                        self.planner.create_plan(
+                            plan
+                        )
                     )
 
 
                     print(
-                        "[Memory] Stored calculation."
+                        f"[Planner] Plan : {execution_plan}"
                     )
 
 
-            # -----------------------------
-            # Memory Saved Response
-            # -----------------------------
+                    print(
+                        "[workflow] Executing..."
+                    )
 
-            elif action == "memory_saved":
+                    state = WorkflowState(
+                            user_id="default",
+                            request=request
+                        )
+                    
+                    context = (
+                        self.workflow.run(
+                            execution_plan,
+                            state
+                        )
+                    )
 
-                result = {
-                    "message":
-                    "I have remembered that."
-                }
+
+                    print(
+                        "[Workflow  Output]",
+                        context
+                    )
+
+
+
+                    # -------------------------
+                    # Store calculator result
+                    # -------------------------
+
+                    for item in context.results:
+
+
+                        if (
+
+                            isinstance(item, dict)
+
+                            and item.get("tool")
+                            == "calculator"
+
+                            and "output" in item
+
+                        ):
+
+
+                            memory = Memory(
+
+                                user_id="default",
+
+                                memory_key="last_calculation",
+
+                                memory_value={
+
+                                    "expression":
+                                    item["input"],
+
+                                    "result":
+                                    item["output"]
+
+                                },
+
+                                memory_type="fact",
+
+                                importance=1
+
+                            )
+
+
+                            self.memory.remember(
+                                memory
+                            )
+
+
+                            print(
+                                "[Memory] Stored calculation."
+                            )
+
+
+
+                    # -------------------------
+                    # Final result
+                    # -------------------------
+
+                    if context.results:
+
+                        result = context.results[-1]
+
+
+                    else:
+
+                        result = {
+
+                            "message":
+                            "Execution returned no result."
+
+                        }
+
+
+
+
+
             # =============================
-            # MEMORY ACTION
+            # MEMORY SEARCH
             # =============================
 
-           
-            elif action == "memory" and self.memory:
+            elif action == "memory":
 
 
                 print(
@@ -244,21 +338,10 @@ class Agent:
 
                 if memory:
 
-                     result = memory
-                     
-                    # result = {
-
-                    #     "memory_key":
-                    #     memory.memory_key,
-
-                    #     "value":
-                    #     memory.memory_value
-
-                    # }
+                    result = memory
 
 
                 else:
-
 
                     result = {
 
@@ -270,12 +353,10 @@ class Agent:
 
 
             # =============================
-            # UNKNOWN ACTION
+            # UNKNOWN
             # =============================
 
-
             else:
-
 
                 result = {
 
@@ -289,7 +370,9 @@ class Agent:
         self.status = "completed"
 
 
-        return self.response_generator.generate(result)
+        return self.response_generator.generate(
+            result
+        )
 
 
 
@@ -298,9 +381,6 @@ class Agent:
         user_id,
         memory_key
     ):
-        """
-        Retrieve stored memory.
-        """
 
 
         if not self.memory:
@@ -309,11 +389,8 @@ class Agent:
 
 
         return self.memory.recall(
-
             user_id,
-
             memory_key
-
         )
 
 
@@ -323,17 +400,11 @@ class Agent:
         user_id,
         memory_key
     ):
-        """
-        Retrieve memory as natural response.
-        """
 
 
         memory = self.recall(
-
             user_id,
-
             memory_key
-
         )
 
 
