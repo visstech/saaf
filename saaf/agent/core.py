@@ -1,3 +1,8 @@
+from saaf.models.memory import Memory
+from saaf.memory.memory_response import MemoryResponse
+from saaf.response.response_generator import ResponseGenerator
+from saaf.memory.memory_extractor import MemoryExtractor
+
 class Agent:
     """
     Core SAAF Agent.
@@ -7,6 +12,7 @@ class Agent:
     of an AI agent.
     """
 
+
     def __init__(
         self,
         name="SAAF-Agent",
@@ -14,6 +20,7 @@ class Agent:
         reasoning=None,
         tools=None,
         observer=None,
+        memory_extractor=None
     ):
 
         self.name = name
@@ -24,7 +31,9 @@ class Agent:
         self.reasoning = reasoning
         self.tools = tools
         self.observer = observer
-
+        # Response Layer
+        self.response_generator = ResponseGenerator()
+        self.memory_extractor = MemoryExtractor()
 
     def run(self, request):
         """
@@ -32,55 +41,302 @@ class Agent:
         through the SAAF pipeline.
         """
 
+
         self.status = "running"
 
-        print(f"[Agent] Request received : {request}")
+
+        print(
+            f"[Agent] Request received : {request}"
+        )
+
+        # -----------------------------
+        # Memory Extraction
+        # -----------------------------
+
+        if self.memory_extractor and self.memory:
+
+            extracted_memory = self.memory_extractor.extract(
+                "default",
+                request
+            )
 
 
-        # 1. Observer Layer
-        if self.observer:
-            print("[Observer] Active")
+            if extracted_memory:
+
+                self.memory.remember(
+                    extracted_memory
+                )
+
+                print(
+                    "[Memory Extractor] "
+                    "New memory stored."
+                )
+
+                # -----------------------------
+                # Observer Layer
+                # -----------------------------
+
+                if self.observer:
+                    print("[Observer] Active")
 
 
-        # 2. Memory Layer
+
+        # -----------------------------
+        # Memory Layer
+        # -----------------------------
+
         if self.memory:
             print("[Memory] Connected")
 
 
-        # 3. Reasoning Layer
+
+        # -----------------------------
+        # Reasoning Layer
+        # -----------------------------
+
         if self.reasoning:
 
-            print("[Reasoning] Creating plan...")
+            print(
+                "[Reasoning] Creating plan..."
+            )
 
-            plan = self.reasoning.plan(request)
 
-            print(f"[Reasoning] Plan : {plan}")
+            plan = self.reasoning.plan(
+                request
+            )
+
+
+            print(
+                f"[Reasoning] Plan : {plan}"
+            )
+
 
         else:
+
             plan = None
 
 
 
-        # 4. Tool Execution Layer
-        if plan and self.tools:
+        # -----------------------------
+        # Execute Plan
+        # -----------------------------
 
-            print("[Tools] Executing...")
 
-            result = self.tools.execute_plan(
-                plan
-            )
+        if not plan:
+
+            result = {
+                "message":
+                "No plan generated."
+            }
+
 
         else:
 
-            result = (
-                f"{self.name} received request: "
-                f"{request}"
+
+            action = plan.get(
+                "action"
             )
 
+            # -----------------------------
+            # Memory Saved
+            # -----------------------------
 
-        # 5. Update status
+            if action == "memory_saved":
+
+                result = {
+
+                    "message":
+                    "I have remembered that information."
+
+                }
+            
+            
+            # =============================
+            # TOOL ACTION
+            # =============================
+
+            if action == "tool" and self.tools:
+
+
+                print(
+                    "[Tools] Executing..."
+                )
+
+
+                result = self.tools.execute_plan(
+                    plan
+                )
+
+
+
+                # Save calculation result
+
+                if (
+                    self.memory
+                    and isinstance(result, dict)
+                    and "output" in result
+                ):
+
+
+                    memory = Memory(
+
+                        user_id="default",
+
+                        memory_key="last_calculation",
+
+                        memory_value={
+
+                            "expression":
+                            result["input"],
+
+                            "result":
+                            result["output"]
+
+                        },
+
+                        memory_type="fact",
+
+                        importance=1
+                    )
+
+
+                    self.memory.remember(
+                        memory
+                    )
+
+
+                    print(
+                        "[Memory] Stored calculation."
+                    )
+
+
+            # -----------------------------
+            # Memory Saved Response
+            # -----------------------------
+
+            elif action == "memory_saved":
+
+                result = {
+                    "message":
+                    "I have remembered that."
+                }
+            # =============================
+            # MEMORY ACTION
+            # =============================
+
+           
+            elif action == "memory" and self.memory:
+
+
+                print(
+                    "[Memory] Searching..."
+                )
+
+
+                memory = self.memory.recall(
+
+                    "default",
+
+                    plan["memory_key"]
+
+                )
+
+
+                if memory:
+
+                     result = memory
+                     
+                    # result = {
+
+                    #     "memory_key":
+                    #     memory.memory_key,
+
+                    #     "value":
+                    #     memory.memory_value
+
+                    # }
+
+
+                else:
+
+
+                    result = {
+
+                        "message":
+                        "I don't remember anything."
+
+                    }
+
+
+
+            # =============================
+            # UNKNOWN ACTION
+            # =============================
+
+
+            else:
+
+
+                result = {
+
+                    "message":
+                    "I don't know how to handle this request."
+
+                }
+
+
 
         self.status = "completed"
 
 
-        return result
+        return self.response_generator.generate(result)
+
+
+
+    def recall(
+        self,
+        user_id,
+        memory_key
+    ):
+        """
+        Retrieve stored memory.
+        """
+
+
+        if not self.memory:
+
+            return None
+
+
+        return self.memory.recall(
+
+            user_id,
+
+            memory_key
+
+        )
+
+
+
+    def recall_response(
+        self,
+        user_id,
+        memory_key
+    ):
+        """
+        Retrieve memory as natural response.
+        """
+
+
+        memory = self.recall(
+
+            user_id,
+
+            memory_key
+
+        )
+
+
+        return MemoryResponse.format(
+            memory
+        )

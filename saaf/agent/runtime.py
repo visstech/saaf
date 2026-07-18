@@ -11,6 +11,7 @@ from saaf.tools.tool_manager import ToolManager
 from saaf.tools.calculator_tool import CalculatorTool
 
 from saaf.observer.observer import Observer
+from saaf.memory.memory_extractor import MemoryExtractor
 
 
 def create_runtime():
@@ -48,6 +49,8 @@ def create_runtime():
 
     # Reasoning
     reasoning_engine = ReasoningEngine()
+    #memory Extractor 
+    memory_extractor = MemoryExtractor()
 
 
     # Observer
@@ -58,5 +61,6 @@ def create_runtime():
         "memory": memory_manager,
         "reasoning": reasoning_engine,
         "tools": tool_manager,
-        "observer": observer
+        "observer": observer,
+        "memory_extractor": memory_extractor
     }

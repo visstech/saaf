@@ -1,5 +1,6 @@
 import json
 import sqlite3
+import os
 from saaf.models.memory import Memory
 from saaf.storage.base_storage import BaseStorage
 from saaf.config.settings import DATABASE_PATH
@@ -17,7 +18,7 @@ class SQLiteStorage(BaseStorage):
 
     def __init__(self):
         self.connection = None
-
+        self.initialize()
 
     def initialize(self):
         """
@@ -25,6 +26,13 @@ class SQLiteStorage(BaseStorage):
         and create required tables.
         """
 
+        folder = os.path.dirname(DATABASE_PATH)
+
+        if folder:
+            os.makedirs(
+                folder,
+                exist_ok=True
+            )
         self.connection = sqlite3.connect(
             DATABASE_PATH
         )
