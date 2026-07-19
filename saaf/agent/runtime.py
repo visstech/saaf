@@ -14,6 +14,7 @@ from saaf.tools.calculator_tool import CalculatorTool
 from saaf.observer.observer import Observer
 
 from saaf.memory.memory_extractor import MemoryExtractor
+from saaf.llm import (LLMManager, OllamaLLM)
 
 
 # Temporary Executor (we will remove later)
@@ -96,13 +97,36 @@ def create_runtime():
         calculator
     )
 
+    # -----------------------------
+    # LLM Layer
+    # -----------------------------
+
+    llm_manager = LLMManager()
+
+
+    llm_manager.register(
+        "fast",
+        OllamaLLM(
+            model="phi3"
+        )
+    )
+
+
+    llm_manager.register(
+        "reasoning",
+        OllamaLLM(
+            model="deepseek-r1"
+        )
+    )
 
 
     # =====================================
     # Reasoning Layer
     # =====================================
 
-    reasoning_engine = ReasoningEngine()
+    reasoning_engine = ReasoningEngine(
+    llm=llm_manager
+        )       
 
 
     planner = Planner()
@@ -228,6 +252,8 @@ def create_runtime():
 
         # Registry access
         "registry":
-        registry
+        registry,
+        
+        "llm": llm_manager,
 
     }

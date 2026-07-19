@@ -1,3 +1,7 @@
+from saaf.llm import LLMOutputParser
+from saaf.validation.validator import IntentValidator
+
+
 class ReasoningEngine:
     """
     SAAF reasoning layer.
@@ -7,9 +11,205 @@ class ReasoningEngine:
     """
 
 
-    def plan(self, user_request: str):
+    def __init__(
+        self,
+        llm=None
+    ):
 
-        request = user_request.lower().strip()
+        self.llm = llm
+
+        self.parser = LLMOutputParser()
+
+        self.validator = IntentValidator()
+
+
+
+    def plan(
+        self,
+        user_request: str
+    ):
+
+        request = (
+            user_request
+            .lower()
+            .strip()
+        )
+
+
+        # -----------------------------
+        # LLM Reasoning
+        # -----------------------------
+
+        if self.llm:
+
+            try:
+
+                return self.llm_reasoning(
+                    user_request
+                )
+
+
+            except Exception as ex:
+
+                print(
+                    "[LLM Reasoning Failed]",
+                    ex
+                )
+
+                print(
+                    "[Fallback] Using rules"
+                )
+
+
+
+        # -----------------------------
+        # Rule Based Fallback
+        # -----------------------------
+
+        return self.rule_based_plan(
+            request
+        )
+
+
+
+    # ==================================================
+    # LLM PLANNING
+    # ==================================================
+
+    def llm_reasoning(
+        self,
+        request
+    ):
+
+
+        prompt = f"""
+
+You are the reasoning engine of an AI Agent Framework.
+
+Convert the user request into JSON.
+
+Available actions:
+
+1. tool
+2. memory
+3. workflow
+4. memory_saved
+5. unknown
+
+
+Examples:
+
+
+User:
+calculate 10*20
+
+
+Output:
+
+{{
+"action":"tool",
+"tool":"calculator",
+"input":"10*20"
+}}
+
+
+
+User:
+calculate 10*20 and save result
+
+
+Output:
+
+{{
+"action":"workflow",
+
+"steps":[
+
+{{
+"action":"tool",
+"tool":"calculator",
+"input":"10*20"
+}},
+
+{{
+"action":"save_memory",
+"memory_key":"last_calculation"
+}}
+
+]
+
+}}
+
+
+
+User request:
+
+{request}
+
+
+
+Return only JSON.
+
+"""
+
+
+        # -----------------------------
+        # Call LLM
+        # -----------------------------
+
+        response = self.llm.generate_default(
+            prompt
+        )
+
+
+        print(
+            "[LLM Response]",
+            response
+        )
+
+
+        # -----------------------------
+        # Parse JSON
+        # -----------------------------
+
+        data = self.parser.parse(
+            response
+        )
+
+
+        print(
+            "[Parsed Intent]",
+            data
+        )
+
+
+        # -----------------------------
+        # Validate Intent
+        # -----------------------------
+
+        intent = self.validator.validate(
+            data
+        )
+
+
+        print(
+            "[Validated Intent]",
+            intent
+        )
+
+
+        return intent
+
+
+
+    # ==================================================
+    # RULE ENGINE FALLBACK
+    # ==================================================
+
+    def rule_based_plan(
+        self,
+        request
+    ):
 
 
         # -----------------------------
@@ -19,50 +219,83 @@ class ReasoningEngine:
         if "last calculation" in request:
 
             return {
-                "action": "memory",
-                "memory_key": "last_calculation"
+
+                "action":
+                "memory",
+
+                "memory_key":
+                "last_calculation"
+
             }
+
 
 
         if "what is my name" in request:
 
             return {
-                "action": "memory",
-                "memory_key": "name"
+
+                "action":
+                "memory",
+
+                "memory_key":
+                "name"
+
             }
 
 
+
         # -----------------------------
-        # Memory Statement
+        # Memory Save
         # -----------------------------
 
-        if "my name" in request and "is" in request:
+        if (
+            "my name" in request
+            and "is" in request
+        ):
 
             return {
-                "action": "memory_saved",
-                "memory_key": "name"
+
+                "action":
+                "memory_saved",
+
+                "memory_key":
+                "name"
+
             }
+
+
 
         if "i know" in request:
 
             return {
-                "action": "memory_saved",
-                "memory_key": "skills"
+
+                "action":
+                "memory_saved",
+
+                "memory_key":
+                "skills"
+
             }
+
+
+
         # -----------------------------
-        # Tool Execution
+        # Calculator Workflow
         # -----------------------------
 
         if "calculate" in request:
 
 
-            expression = request.replace(
-                "calculate",
-                ""
+            expression = (
+                request
+                .replace(
+                    "calculate",
+                    ""
+                )
+                .strip()
             )
 
 
-            # Multi-step workflow
 
             if "save" in expression:
 
@@ -76,21 +309,29 @@ class ReasoningEngine:
 
                 return {
 
-                    "action":"workflow",
+                    "action":
+                    "workflow",
+
 
                     "steps":[
 
+
                         {
-                            "action":"tool",
+                            "action":
+                            "tool",
 
-                            "tool":"calculator",
+                            "tool":
+                            "calculator",
 
-                            "input":expression
+                            "input":
+                            expression
 
                         },
 
+
                         {
-                            "action":"save_memory",
+                            "action":
+                            "save_memory",
 
                             "memory_key":
                             "last_calculation"
@@ -103,18 +344,20 @@ class ReasoningEngine:
 
 
 
-            # Normal calculation
-
             return {
 
-                "action":"tool",
+                "action":
+                "tool",
 
-                "tool":"calculator",
+                "tool":
+                "calculator",
 
                 "input":
-                expression.strip()
+                expression
 
             }
+
+
 
         # -----------------------------
         # Unknown
@@ -122,7 +365,10 @@ class ReasoningEngine:
 
         return {
 
-            "action": "unknown",
+            "action":
+            "unknown",
 
-            "input": user_request
+            "input":
+            request
+
         }
