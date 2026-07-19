@@ -1,8 +1,7 @@
-# SAAF
-
+# 🚀 SAAF
 # Simple AI Agent Framework
 
-## Learn. Build. Understand AI Agents.
+### Learn. Build. Understand AI Agents.
 
 An open-source AI Agent Engineering framework designed to help developers understand, build, and extend intelligent agent systems.
 
@@ -10,163 +9,438 @@ An open-source AI Agent Engineering framework designed to help developers unders
 
 # 🌟 Overview
 
-SAAF (Simple AI Agent Framework) is a modular framework for learning and engineering AI agents.
+SAAF (Simple AI Agent Framework) is a modular AI Agent framework built from scratch using Python.
 
-The goal of SAAF is not only to build AI agents, but to make the internal architecture of AI agents understandable.
+The goal of SAAF is not only to create AI agents, but to make the internal architecture of AI agents understandable.
 
-SAAF exposes the core building blocks behind intelligent agents:
+Unlike frameworks that hide complexity behind abstractions, SAAF exposes the fundamental building blocks:
 
-* Memory
-* Storage
-* Language Models
-* Tools
-* Reasoning
-* Planning
-* Knowledge Systems
+- 🧠 Memory Systems
+- 💾 Storage Layer
+- 🤖 Language Models
+- 🔌 Tools
+- 🧩 Reasoning Engine
+- 📋 Intent Management
+- 📝 Planning
+- ⚙️ Workflow Execution
+- 🔄 Agent Runtime
 
-Developers can learn how these components work together to create intelligent applications.
+Developers can learn how intelligent agents perceive, reason, plan, execute, and remember.
 
 ---
 
 # 🎯 Vision
 
-AI agents are becoming a fundamental part of modern software systems.
+AI Agents are becoming a fundamental part of modern software engineering.
 
-However, many frameworks hide the internal working mechanisms behind abstractions.
+However, many frameworks hide the internal decision-making process.
 
-SAAF focuses on transparency and education by providing:
-
-* Clear architecture
-* Modular components
-* Simple implementations
-* Practical examples
+SAAF focuses on transparency and education.
 
 The mission:
 
 > Make AI Agent Engineering simple, understandable, and accessible.
 
+SAAF provides:
+
+✅ Clear architecture  
+✅ Modular components  
+✅ Educational implementations  
+✅ Practical engineering examples  
+
 ---
 
 # 🏗️ Architecture Overview
 
-SAAF follows a modular layered architecture:
+SAAF follows a layered agent architecture:
+
 
 ```
-                    User Application
+                       User Application
 
-                           |
+                              |
+                              ▼
 
-                           ▼
+                         SAAF Agent
 
-                       SAAF Core
+                              |
+        ------------------------------------------------
 
-                           |
+        |              |              |               |
 
-       -----------------------------------------
+        ▼              ▼              ▼               ▼
 
-       |                 |                     |
+    Memory        Reasoning        Tools        Observer
 
-       ▼                 ▼                     ▼
+        |              |              |               |
 
-    Memory          Intelligence            Tools
+        ▼              ▼              ▼               ▼
 
-       |                 |                     |
 
-       ▼                 ▼                     ▼
+   Storage       LLM Engine     Tool Registry    Monitoring
 
-  Storage Layer       LLM Layer          External Systems
+
+                              |
+
+                              ▼
+
+
+                    Intent Validation Layer
+
+
+                              |
+
+                              ▼
+
+
+                         Planner
+
+
+                              |
+
+                              ▼
+
+
+                    Workflow Execution Engine
+
+
+                              |
+
+                              ▼
+
+
+                       Workflow Nodes
 
 ```
 
 ---
 
-# ✨ Features
+# ✨ Current Features
 
 ## 🧠 Memory System
 
-SAAF provides a flexible memory architecture:
+SAAF provides a modular memory architecture:
 
-* Conversation Memory
-* Short-Term Memory
-* Long-Term Memory
-* Memory Manager
+- Conversation Memory
+- Short-Term Memory
+- Long-Term Memory
+- Memory Manager
+- Persistent Storage
 
-Current implementation:
+
+Architecture:
 
 ```
-Memory Manager
+                 Memory Manager
 
-      |
-      |
- --------------------
- |        |         |
- ▼        ▼         ▼
+                       |
 
-Conversation Short   Long
-Memory     Term     Term
+       --------------------------------
 
-              |
-              ▼
+       |              |               |
 
-            SQLite
+       ▼              ▼               ▼
+
+ Conversation     Short-Term     Long-Term
+
+ Memory            Memory         Memory
+
+                                      |
+
+                                      ▼
+
+                                  SQLite
+
 ```
 
 ---
 
-## 💾 Storage Layer
+# 💾 Storage Layer
 
 Persistent memory storage.
 
-Current support:
+Current:
 
-* SQLite
+✅ SQLite
 
-Future support:
 
-* PostgreSQL
-* Vector Databases
+Future:
+
+- PostgreSQL
+- Vector Databases
+- Knowledge Graph Storage
+
 
 ---
 
-## 🔌 Modular Architecture
+# 🔌 Tool Framework
 
-SAAF components are designed independently.
+SAAF supports modular tools.
 
-Future extensions:
+Current tools:
 
-* Different LLM providers
-* Custom memory systems
-* New tools
-* New reasoning engines
+✅ Calculator Tool
+
+
+Architecture:
+
+```
+Tool Manager
+
+      |
+
+      |
+
+ -----------------
+
+ |               |
+
+Calculator     Future Tools
+
+```
+
+Future tools:
+
+- SQL Agent
+- Web Search
+- PDF Analyzer
+- Email Agent
+- API Tools
+
+---
+
+# 🤖 LLM Integration
+
+SAAF supports local Large Language Models.
+
+Current support:
+
+✅ Ollama
+
+Tested models:
+
+- Phi3
+- Llama3
+- DeepSeek-R1
+- Gemma3
+
+
+Architecture:
+
+```
+User Request
+
+      |
+
+      ▼
+
+Reasoning Engine
+
+      |
+
+      ▼
+
+LLM Manager
+
+      |
+
+      ▼
+
+Ollama Model
+
+      |
+
+      ▼
+
+Structured JSON Intent
+
+```
+
+---
+
+# 🧩 Intent Validation Engine
+
+SAAF converts LLM output into validated agent instructions.
+
+
+Flow:
+
+```
+LLM Response
+
+      |
+
+      ▼
+
+JSON Parser
+
+      |
+
+      ▼
+
+Intent Validator
+
+      |
+
+      ▼
+
+AgentIntent Object
+
+```
+
+Example:
+
+```python
+AgentIntent(
+    action="tool",
+    tool="calculator",
+    input="99*99"
+)
+```
+
+Benefits:
+
+- Structured execution
+- Safer agent decisions
+- Easier debugging
+- Type-safe architecture
+
+---
+
+# 📋 Planning System
+
+SAAF includes a planning layer.
+
+Example:
+
+User:
+
+```
+Calculate 25*40 and save result
+```
+
+
+Generated plan:
+
+```
+Workflow:
+
+1. Execute Calculator Tool
+
+2. Save Result To Memory
+
+```
+
+---
+
+# ⚙️ Workflow Engine
+
+SAAF supports multi-step workflows.
+
+
+Example:
+
+```
+User Request
+
+      |
+
+      ▼
+
+Workflow
+
+      |
+
+ ------------------
+
+ |                |
+
+Execute Tool   Save Memory
+
+      |
+
+      ▼
+
+Workflow State
+
+```
+
+
+Workflow State example:
+
+```python
+WorkflowState(
+ user_id="default",
+ status="completed",
+ data={
+    "last_result":1000
+ }
+)
+```
+
+---
+
+# 🧱 Workflow Nodes
+
+Current nodes:
+
+```
+workflow/
+│
+├── nodes/
+│
+├── calculator_node.py
+│
+├── memory_node.py
+│
+└── tool_node.py
+
+```
+
+Each node performs one specific action.
+
+Future:
+
+- SQL Node
+- API Node
+- Search Node
+- Vision Node
 
 ---
 
 # 🚀 Current Status
 
-Current version:
+## Current Version
 
 ```
-v0.2.0
-Memory Foundation
+v0.7.0
 ```
+
 
 Completed:
 
-✅ Memory Model
-✅ SQLite Storage
-✅ Conversation Memory
-✅ Short-Term Memory
-✅ Long-Term Memory
-✅ Memory Manager
-✅ SAAF Core
+✅ Agent Core  
+✅ Memory System  
+✅ SQLite Storage  
+✅ Tool Manager  
+✅ Calculator Tool  
+✅ Reasoning Engine  
+✅ Planner  
+✅ Workflow Engine  
+✅ Execution Context  
+✅ Workflow Nodes  
+✅ Ollama LLM Integration  
+✅ LLM Output Parser  
+✅ Intent Schema  
+✅ Intent Validation Engine  
+
 
 ---
 
 # ⚡ Quick Start
 
-## Installation
 
-Clone the repository:
+## Clone Repository
 
 ```bash
 git clone https://github.com/visstech/saaf.git
@@ -174,13 +448,15 @@ git clone https://github.com/visstech/saaf.git
 cd saaf
 ```
 
-Create environment:
+
+## Create Environment
 
 ```bash
 python -m venv .venv
 ```
 
-Activate environment:
+
+Activate:
 
 Windows:
 
@@ -188,7 +464,8 @@ Windows:
 .venv\Scripts\activate
 ```
 
-Install dependencies:
+
+Install:
 
 ```bash
 pip install -r requirements.txt
@@ -198,91 +475,85 @@ pip install -r requirements.txt
 
 # 🧪 Example Usage
 
+
 ```python
-from saaf.core import SAAF
-from models.memory import Memory
+from saaf import Agent
 
 
-agent = SAAF()
+agent = Agent()
 
 
-memory = Memory(
-    user_id="senthil",
-    memory_key="skills",
-    memory_value={
-        "languages": [
-            "Python",
-            "SQL",
-            "PyTorch"
-        ]
-    },
-    memory_type="skill",
-    importance=10
+response = agent.run(
+    "calculate 99*99 and save result"
 )
 
 
-agent.memory.remember(memory)
+print(response)
+
+```
 
 
-result = agent.memory.recall(
-    "senthil",
-    "skills"
-)
+Output:
 
-print(result)
+```
+The result of 99*99 is 9801.
 ```
 
 ---
 
 # 📚 Documentation
 
-SAAF documentation:
-
 ```
 docs/
 
-├── 01_introduction/
+├── introduction/
 
-│   ├── vision.md
+├── architecture/
 
-│   ├── architecture.md
+├── memory/
 
-│   └── roadmap.md
+├── reasoning/
 
+├── workflow/
 
-└── 02_core/
+└── examples/
 
-    └── (coming soon)
 ```
+
+Documentation will grow with each SAAF milestone.
 
 ---
 
 # 🛣️ Roadmap
 
-Future SAAF versions:
 
-```
-v0.3.0
-Developer Experience
+## v0.8.0
 
-v0.4.0
-LLM Integration
+Dynamic Tool Registry
 
-v0.5.0
-Tool Framework
+- Automatic tool discovery
+- Plugin architecture
+- Tool selection
 
-v0.6.0
-Reasoning Engine
 
-v0.7.0
-RAG Knowledge System
+## v0.9.0
 
-v0.8.0
-Multi-Agent System
+Knowledge System
 
-v1.0.0
+- Vector Memory
+- Embeddings
+- RAG
+
+
+## v1.0.0
+
 Production AI Agent Framework
-```
+
+- Multi-Agent System
+- API Server
+- Plugin Marketplace
+- Enterprise Deployment
+
 
 ---
 
@@ -290,28 +561,30 @@ Production AI Agent Framework
 
 SAAF welcomes contributions from developers interested in:
 
-* AI agents
-* Machine learning systems
-* Framework engineering
-* Documentation
-* Education
+- AI Agents
+- Machine Learning
+- Framework Engineering
+- LLM Systems
+- Documentation
 
-Future contributors can help improve:
 
-* Core modules
-* Examples
-* Documentation
-* Integrations
+Contributions are welcome in:
+
+- Core modules
+- Examples
+- Documentation
+- Integrations
 
 ---
 
 # 👨‍💻 Developed By
 
-**Vi.S.Senthil Kumar**
+## Vi.S.Senthil Kumar
 
 Founder & Lead Developer
 
 Visstech
+
 
 ---
 
@@ -323,12 +596,16 @@ License information will be added as the project matures.
 
 # 💙 SAAF Philosophy
 
-```
-Learn.
-Build.
-Understand AI Agents.
-```
+
+## Learn.
+
+## Build.
+
+## Understand AI Agents.
+
 
 SAAF is not only a framework for building agents.
 
-It is a framework for understanding how agents are engineered.
+It is a framework for understanding how intelligent agents are engineered.
+
+```
