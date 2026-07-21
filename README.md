@@ -155,6 +155,22 @@ Architecture:
 
 ---
 
+## 🔌 Dynamic Tool Plugin System
+
+SAAF supports modular tool plugins.
+
+New tools can be added without modifying the core framework.
+
+Example:
+
+saaf/tools/plugins/
+
+├── calculator
+├── weather
+└── sql
+
+Each plugin implements BaseTool and is automatically discovered by PluginLoader.
+
 # 💾 Storage Layer
 
 Persistent memory storage.
