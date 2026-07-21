@@ -8,25 +8,20 @@ from saaf.storage.sqlite_storage import SQLiteStorage
 from saaf.reasoning.reasoning_engine import ReasoningEngine
 from saaf.reasoning.planner import Planner
 
-from saaf.tools.tool_manager import ToolManager
-from saaf.tools.calculator_tool import CalculatorTool
+from saaf.tools.tool_manager import ToolManager 
+from saaf.tools.plugin_loader import PluginLoader
 
 from saaf.observer.observer import Observer
 
 from saaf.memory.memory_extractor import MemoryExtractor
 from saaf.llm import (LLMManager, OllamaLLM)
-
-
-# Temporary Executor (we will remove later)
-from saaf.runtime.executor import Executor
-
-
 # Workflow System
 from saaf.workflow.workflow import WorkflowEngine
 from saaf.workflow.registry import WorkflowRegistry
 
-from saaf.workflow.nodes.calculator_node import CalculatorNode
+#from saaf.workflow.nodes.calculator_node import CalculatorNode
 from saaf.workflow.nodes.memory_node import MemoryNode
+from saaf.workflow.nodes.tool_node import ToolNode
 
 
 
@@ -88,14 +83,18 @@ def create_runtime():
     # =====================================
 
     tool_manager = ToolManager()
+    
+    plugin_loader = PluginLoader()
+
+    plugins = plugin_loader.load_plugins()
 
 
-    calculator = CalculatorTool()
+    for tool in plugins:
 
-
-    tool_manager.register_tool(
-        calculator
-    )
+        tool_manager.register_tool(
+            tool
+        )
+    
 
     # -----------------------------
     # LLM Layer
@@ -104,20 +103,12 @@ def create_runtime():
     llm_manager = LLMManager()
 
 
-    llm_manager.register(
-        "fast",
-        OllamaLLM(
-            model="phi3"
-        )
-    )
+    llm_manager.register("fast",
+                 OllamaLLM(model="phi3"))
 
 
-    llm_manager.register(
-        "reasoning",
-        OllamaLLM(
-            model="deepseek-r1"
-        )
-    )
+    llm_manager.register("reasoning",
+               OllamaLLM(model="deepseek-r1"))
 
 
     # =====================================
@@ -160,25 +151,12 @@ def create_runtime():
     # Register Workflow Nodes
 
     registry.register(
-
-        "execute_tool",
-
-        CalculatorNode(
-            tool_manager
-        )
-
-    )
+            "execute_tool",
+            ToolNode(tool_manager))
 
 
-    registry.register(
-
-        "save_memory",
-
-        MemoryNode(
-            memory_manager
-        )
-
-    )
+    registry.register("save_memory",
+        MemoryNode(memory_manager))
 
 
 
@@ -199,13 +177,9 @@ def create_runtime():
     # Temporary
     # =====================================
 
-    executor = Executor(
-
-        tools=tool_manager,
-
-        memory=memory_manager
-
-    )
+    # executor = Executor(
+    #     tools=tool_manager,
+    #     memory=memory_manager)
 
 
 
@@ -214,46 +188,24 @@ def create_runtime():
     # =====================================
 
     return {
-
-
         "memory":
         memory_manager,
-
-
         "reasoning":
         reasoning_engine,
-
-
         "tools":
         tool_manager,
-
-
         "observer":
         observer,
-
-
         "memory_extractor":
         memory_extractor,
-
-
         "planner":
-        planner,
-
-
-        # Temporary
-        "executor":
-        executor,
-
-
+        planner,       
         # New Workflow Engine
         "workflow":
         workflow,
-
-
         # Registry access
         "registry":
-        registry,
-        
+        registry,        
         "llm": llm_manager,
 
     }

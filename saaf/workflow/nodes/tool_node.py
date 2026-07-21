@@ -1,20 +1,17 @@
 from saaf.workflow.node import WorkflowNode
 
 
-
 class ToolNode(WorkflowNode):
-
 
     name = "tool"
 
 
-
     def __init__(
         self,
-        tools
+        tool_manager
     ):
 
-        self.tools = tools
+        self.tool_manager = tool_manager
 
 
 
@@ -25,13 +22,10 @@ class ToolNode(WorkflowNode):
     ):
 
 
-        result = self.tools.execute_plan(
+        result = self.tool_manager.execute_plan(
             {
-                "tool":
-                step["tool"],
-
-                "input":
-                step["input"]
+                "tool": step["tool"],
+                "input": step["input"]
             }
         )
 

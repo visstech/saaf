@@ -14,30 +14,43 @@ class BaseTool(ABC):
     @property
     @abstractmethod
     def name(self) -> str:
-        """
-        Unique name of the tool
-        Example: 'calculator', 'weather'
-        """
         pass
+
+
 
     @property
     @abstractmethod
     def description(self) -> str:
-        """
-        Human-readable description of the tool.
-        Helps LLM decide which tool to use.
-        """
         pass
 
+
+
+    @property
+    def version(self):
+
+        return "1.0"
+
+
+
+    def schema(self):
+
+        return {
+
+            "name": self.name,
+
+            "description":
+            self.description,
+
+            "version":
+            self.version
+
+        }
+
+
     @abstractmethod
-    def execute(self, query: str):
-        """
-        Main function that runs the tool logic.
+    def execute(
+        self,
+        query: str
+    ):
 
-        Args:
-            query (str): Input from user or agent
-
-        Returns:
-            Any: Result of tool execution
-        """
         pass

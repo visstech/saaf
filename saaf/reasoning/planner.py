@@ -1,132 +1,172 @@
+from saaf.models.intent import AgentIntent, AgentStep
+
+
 class Planner:
     """
-    Converts intent into
-    executable workflow.
+    Converts validated AgentIntent
+    into executable workflow.
     """
 
 
     def create_plan(
         self,
-        intent
+        intent: AgentIntent
     ):
 
-
-        action = intent.get(
-            "action"
-        )
+        action = intent.action
 
 
-        # ---------------------
-        # Tool workflow
-        # ---------------------
+        # =================================
+        # Single Tool Execution
+        # =================================
 
         if action == "tool":
 
             return [
 
                 {
-                    "step":1,
+                    "step": 1,
 
                     "action":
                     "execute_tool",
 
                     "tool":
-                    intent["tool"],
+                    intent.tool,
 
                     "input":
-                    intent["input"]
-
+                    intent.input
                 }
 
             ]
 
 
-
-        # ---------------------
-        # Memory search
-        # ---------------------
+        # =================================
+        # Memory Recall
+        # =================================
 
         elif action == "memory":
 
             return [
 
                 {
-                    "step":1,
+                    "step": 1,
 
                     "action":
                     "search_memory",
 
                     "memory_key":
-                    intent["memory_key"]
-
+                    intent.memory_key
                 }
 
             ]
 
 
-
-        # ---------------------
-        # Save memory workflow
-        # ---------------------
+        # =================================
+        # Save Memory
+        # =================================
 
         elif action == "memory_saved":
 
             return [
 
                 {
-                    "step":1,
+                    "step": 1,
 
                     "action":
                     "save_memory",
 
                     "memory_key":
-                    intent["memory_key"]
+                    intent.memory_key
+                }
+
+            ]
+
+
+        # =================================
+        # Multi-Step Workflow
+        # =================================
+
+        elif action == "workflow":
+
+            execution_plan = []
+
+
+            for index, step in enumerate(
+                intent.steps,
+                start=1
+            ):
+
+
+                # -------------------------
+                # Tool Step
+                # -------------------------
+
+                if step.action == "tool":
+
+                    execution_plan.append(
+
+                        {
+
+                            "step":
+                            index,
+
+                            "action":
+                            "execute_tool",
+
+                            "tool":
+                            step.tool,
+
+                            "input":
+                            step.input
+
+                        }
+
+                    )
+
+
+                # -------------------------
+                # Memory Step
+                # -------------------------
+
+                elif step.action == "save_memory":
+
+                    execution_plan.append(
+
+                        {
+
+                            "step":
+                            index,
+
+                            "action":
+                            "save_memory",
+
+                            "memory_key":
+                            step.memory_key
+
+                        }
+
+                    )
+
+
+            return execution_plan
+
+
+
+        # =================================
+        # Unknown Intent
+        # =================================
+
+        else:
+
+            return [
+
+                {
+
+                    "step":1,
+
+                    "action":
+                    "unknown"
 
                 }
 
             ]
-            
-        elif action == "workflow":
-
-            execution_plan=[]
-
-
-            for index, step in enumerate(
-                intent["steps"],
-                start=1
-            ):
-
-                if step["action"]=="tool":
-
-                    execution_plan.append({
-
-                        "step":index,
-
-                        "action":
-                        "execute_tool",
-
-                        "tool":
-                        step["tool"],
-
-                        "input":
-                        step["input"]
-
-                    })
-
-
-        elif step["action"]=="save_memory":
-
-            execution_plan.append({
-
-                "step":index,
-
-                "action":
-                "save_memory",
-
-                "memory_key":
-                step["memory_key"]
-
-            })
-
-
-        return execution_plan

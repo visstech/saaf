@@ -27,8 +27,7 @@ class SAAFAgent(CoreAgent):
         reasoning=None,
         tools=None,
         observer=None,
-        planner=None,
-        executor=None,
+        planner=None,       
         memory_extractor=None,
         workflow=None
     ):
@@ -59,11 +58,7 @@ class SAAFAgent(CoreAgent):
 
 
         if planner is None:
-            planner = runtime["planner"]
-
-
-        if executor is None:
-            executor = runtime["executor"]
+            planner = runtime["planner"]        
 
 
         if memory_extractor is None:
@@ -87,8 +82,6 @@ class SAAFAgent(CoreAgent):
             observer=observer,
 
             planner=planner,
-
-            executor=executor,
 
             memory_extractor=memory_extractor,
             
@@ -115,10 +108,7 @@ class SAAFAgent(CoreAgent):
             type(self.tools).__name__,
 
             "planner":
-            type(self.planner).__name__,
-
-            "executor":
-            type(self.executor).__name__,
+            type(self.planner).__name__,           
 
             "observer":
             type(self.observer).__name__

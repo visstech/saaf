@@ -24,8 +24,7 @@ class Agent:
         tools=None,
         observer=None,
         memory_extractor=None,
-        planner=None,
-        executor=None,
+        planner=None,        
         workflow=None
     ):
 
@@ -46,7 +45,7 @@ class Agent:
         )
 
         self.planner = planner
-        self.executor = executor
+       
 
 
 
@@ -154,9 +153,13 @@ class Agent:
         else:
 
 
-            action = plan.get(
-                "action"
-            )
+            if isinstance(plan, dict):
+
+                action = plan.get("action")
+
+            else:
+
+                action = plan.action
 
 
 
@@ -186,12 +189,12 @@ class Agent:
             ]:
 
 
-                if not self.planner or not self.executor:
+                if not self.planner or not self.workflow:
 
                     result = {
 
                         "message":
-                        "Executor not available."
+                        "Workflow not available."
 
                     }
 
@@ -299,7 +302,7 @@ class Agent:
 
                     if context.results:
 
-                        result = context.results[-1]
+                        result = context.results
 
 
                     else:

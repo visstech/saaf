@@ -2,10 +2,21 @@
 from saaf.tools.base_tool import BaseTool
 
 
+
 class CalculatorTool(BaseTool):
-    """
-    Tool for performing basic mathematical calculations.
-    """
+    
+    name = "calculator"
+    description = """
+        Performs mathematical calculations.
+        Supports:
+        addition
+        subtraction
+        multiplication
+        division
+        """
+    parameters = {
+            "expression":"string"
+        }
 
     @property
     def name(self) -> str:
@@ -42,3 +53,4 @@ class CalculatorTool(BaseTool):
                 "input": query,
                 "error": str(e)
             }
+tool = CalculatorTool()
