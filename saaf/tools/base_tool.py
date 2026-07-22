@@ -35,16 +35,13 @@ class BaseTool(ABC):
     def schema(self):
 
         return {
-
             "name": self.name,
-
-            "description":
-            self.description,
-
-            "version":
-            self.version
-
-        }
+            "description": self.description,
+            "version": self.version,
+            "category": self.category,
+            "parameters": self.parameters,
+            "examples": self.examples
+            }
 
 
     @abstractmethod

@@ -29,7 +29,8 @@ class SAAFAgent(CoreAgent):
         observer=None,
         planner=None,       
         memory_extractor=None,
-        workflow=None
+        workflow=None,
+        formatter_registry=None
     ):
 
 
@@ -66,6 +67,9 @@ class SAAFAgent(CoreAgent):
         
         if workflow is None:
             workflow = runtime["workflow"]
+        
+        if formatter_registry is None:
+            formatter_registry = runtime["formatter_registry"]
 
 
 
@@ -85,7 +89,8 @@ class SAAFAgent(CoreAgent):
 
             memory_extractor=memory_extractor,
             
-            workflow=workflow
+            workflow=workflow,
+            formatter_registry=formatter_registry
         )
 
 

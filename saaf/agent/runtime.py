@@ -23,6 +23,12 @@ from saaf.workflow.registry import WorkflowRegistry
 from saaf.workflow.nodes.memory_node import MemoryNode
 from saaf.workflow.nodes.tool_node import ToolNode
 
+from saaf.response.formatter_registry import FormatterRegistry
+
+from saaf.response.formatters.calculator_formatter import CalculatorFormatter
+from saaf.response.formatters.weather_formatter import WeatherFormatter
+from saaf.response.formatter_loader import FormatterLoader
+
 
 
 def create_runtime():
@@ -116,8 +122,9 @@ def create_runtime():
     # =====================================
 
     reasoning_engine = ReasoningEngine(
-    llm=llm_manager
-        )       
+            llm=llm_manager,
+            tools=tool_manager
+        )     
 
 
     planner = Planner()
@@ -170,6 +177,15 @@ def create_runtime():
 
     )
 
+    formatter_registry = FormatterRegistry()
+
+    loader = FormatterLoader()
+
+    for formatter in loader.load_formatters():
+
+        formatter_registry.register(
+            formatter
+        )
 
 
     # =====================================
@@ -207,5 +223,6 @@ def create_runtime():
         "registry":
         registry,        
         "llm": llm_manager,
+        "formatter_registry": formatter_registry
 
     }

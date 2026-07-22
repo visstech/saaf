@@ -24,7 +24,15 @@ class ToolManager:
             or ToolRegistry()
         )
 
+    def tool_schemas(self) -> list[dict]:
+        """
+        Return schemas of all registered tools.
+        """
 
+        return [
+            tool.schema
+            for tool in self._tools.values()
+        ]
 
     def register_tool(
         self,

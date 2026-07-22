@@ -46,7 +46,7 @@ class ToolRegistry:
 
         return [
 
-            tool.schema()
+            tool.schema
 
             for tool in self.tools.values()
 

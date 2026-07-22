@@ -168,22 +168,24 @@ class IntentValidator:
         # Single Action Intent
         # ==================================
 
+        tool = data.get("tool")
+
+        tool_input = (
+            data.get("input")
+            or data.get("city")
+            or data.get("query")
+            or data.get("expression")
+        )
+
         return AgentIntent(
 
             action=action,
 
-            tool=data.get(
-                "tool"
-            ),
+            tool=tool,
 
-            input=data.get(
-                "input"
-            ),
+            input=tool_input,
 
-            memory_key=data.get(
-                "memory_key"
-            ),
+            memory_key=data.get("memory_key"),
 
             raw=data
-
         )

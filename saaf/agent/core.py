@@ -3,6 +3,7 @@ from saaf.memory.memory_response import MemoryResponse
 from saaf.response.response_generator import ResponseGenerator
 from saaf.memory.memory_extractor import MemoryExtractor
 from saaf.workflow.state import WorkflowState
+from saaf.plugins.plugin_manager import PluginManager
 
 
 
@@ -25,7 +26,8 @@ class Agent:
         observer=None,
         memory_extractor=None,
         planner=None,        
-        workflow=None
+        workflow=None,
+         formatter_registry=None
     ):
 
         self.name = name
@@ -35,9 +37,12 @@ class Agent:
         self.reasoning = reasoning
         self.tools = tools
         self.observer = observer
-        self.workflow = workflow
-
-        self.response_generator = ResponseGenerator()
+        self.workflow = workflow        
+        self.formatter_registry = formatter_registry
+        
+        self.response_generator = ResponseGenerator(
+            formatter_registry
+        )
 
         self.memory_extractor = (
             memory_extractor
@@ -45,6 +50,8 @@ class Agent:
         )
 
         self.planner = planner
+        self.plugin_manager = PluginManager()
+        self.plugin_manager.load_plugins()
        
 
 

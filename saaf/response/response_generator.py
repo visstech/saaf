@@ -1,17 +1,19 @@
-from saaf.models.memory import Memory
-
-
 class ResponseGenerator:
     """
-    Converts agent execution results
-    into human-readable responses.
+    Generates final human-readable responses.
 
-    Supports:
-    - Tool results
-    - Workflow results
-    - Memory responses
-    - Message responses
+    Uses FormatterRegistry to dynamically
+    select the correct formatter.
     """
+
+
+    def __init__(
+        self,
+        formatter_registry
+    ):
+
+        self.formatter_registry = formatter_registry
+
 
 
     def generate(
@@ -31,13 +33,7 @@ class ResponseGenerator:
             )
 
 
-        calculator_result = None
-        memory_saved = False
-
-
-        # ==========================================
-        # WorkflowState Support
-        # ==========================================
+        # WorkflowState support
 
         if hasattr(
             result,
@@ -48,14 +44,15 @@ class ResponseGenerator:
 
 
 
-        # ==========================================
-        # Workflow Result List Support
-        # ==========================================
+        # Workflow result list
 
         if isinstance(
             result,
             list
         ):
+
+
+            responses = []
 
 
             for item in result:
@@ -69,149 +66,47 @@ class ResponseGenerator:
                     continue
 
 
-
-                # Calculator result
-
-                if (
-
-                    item.get("tool")
-                    == "calculator"
-
-                    and "output"
-                    in item
-
-                ):
-
-                    calculator_result = item
-
-
-
-                # Memory saved
-
-                if item.get(
-                    "memory_saved"
-                ):
-
-                    memory_saved = True
-
-
-
-            response = ""
-
-
-
-            if calculator_result:
-
-                value = calculator_result["output"]
-
-                if isinstance(value, float):
-                    value = round(value, 4)
-
                 response = (
-                    f"The result of "
-                    f"{calculator_result['input']} "
-                    f"is {value}."
+                    self.formatter_registry.format(
+                        item
+                    )
+                )
+
+
+                if response:
+
+                    responses.append(
+                        response
+                    )
+
+
+            if responses:
+
+                return " ".join(
+                    responses
                 )
 
 
 
-            if memory_saved:
+        # Single tool result
+
+        if isinstance(
+            result,
+            dict
+        ):
 
 
-                response += (
-
-                    " I have saved this result "
-                    "in memory."
-
+            response = (
+                self.formatter_registry.format(
+                    result
                 )
-
+            )
 
 
             if response:
 
                 return response
 
-
-
-        # ==========================================
-        # Single Calculator Dictionary
-        # ==========================================
-
-        if isinstance(
-            result,
-            dict
-        ):
-
-
-            if (
-
-                result.get("tool")
-                == "calculator"
-
-                and "output"
-                in result
-
-            ):
-
-
-                return (
-
-                    f"The result of "
-                    f"{result['input']} "
-                    f"is "
-                    f"{result['output']}."
-
-                )
-
-
-
-        # ==========================================
-        # Memory Object Response
-        # ==========================================
-
-        if isinstance(
-            result,
-            Memory
-        ):
-
-
-            if result.memory_key == "name":
-
-
-                return (
-
-                    f"Your name is "
-                    f"{result.memory_value}."
-
-                )
-
-
-
-            if result.memory_key == "last_calculation":
-
-
-                value = result.memory_value
-
-
-                return (
-
-                    f"Your last calculation was "
-                    f"{value['expression']} "
-                    f"= "
-                    f"{value['result']}."
-
-                )
-
-
-
-        # ==========================================
-        # Message Dictionary
-        # ==========================================
-
-        if isinstance(
-            result,
-            dict
-        ):
 
 
             if "message" in result:

@@ -1,5 +1,6 @@
 from saaf.llm import LLMOutputParser
 from saaf.validation.validator import IntentValidator
+from saaf.reasoning.prompt_builder import PromptBuilder
 
 
 class ReasoningEngine:
@@ -13,14 +14,15 @@ class ReasoningEngine:
 
     def __init__(
         self,
-        llm=None
+        llm=None,
+        tools=None
     ):
 
         self.llm = llm
-
+        self.tools = tools
         self.parser = LLMOutputParser()
-
         self.validator = IntentValidator()
+        self.prompt_builder = PromptBuilder()
 
 
 
@@ -80,77 +82,28 @@ class ReasoningEngine:
         self,
         request
     ):
-
-
+        # =====================================
+        # Dynamic Prompt Generation
+        # =====================================
+        tool_schemas = None
+        if self.tools:
+            tool_schemas = (
+                self.tools.tool_schemas()
+            )
+        dynamic_prompt = (
+            self.prompt_builder.build(
+                tool_schemas
+            )
+        )
         prompt = f"""
+        {dynamic_prompt}
 
-You are the reasoning engine of an AI Agent Framework.
+        User request:
+        {request}
 
-Convert the user request into JSON.
+        Return only JSON.
 
-Available actions:
-
-1. tool
-2. memory
-3. workflow
-4. memory_saved
-5. unknown
-
-
-Examples:
-
-
-User:
-calculate 10*20
-
-
-Output:
-
-{{
-"action":"tool",
-"tool":"calculator",
-"input":"10*20"
-}}
-
-
-
-User:
-calculate 10*20 and save result
-
-
-Output:
-
-{{
-"action":"workflow",
-
-"steps":[
-
-{{
-"action":"tool",
-"tool":"calculator",
-"input":"10*20"
-}},
-
-{{
-"action":"save_memory",
-"memory_key":"last_calculation"
-}}
-
-]
-
-}}
-
-
-
-User request:
-
-{request}
-
-
-
-Return only JSON.
-
-"""
+        """
 
 
         # -----------------------------
