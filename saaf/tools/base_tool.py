@@ -1,19 +1,27 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from saaf.plugins.base_plugin import BasePlugin
 
 
-class BaseTool(ABC):
+class BaseTool(BasePlugin):
     """
-    Abstract base class for all tools in the AI Agent system.
-
-    Every tool MUST follow this structure:
-    - name (identifier)
-    - description (what it does)
-    - execute() (main logic)
+    Base class for SAAF executable tools.
     """
+
+
+    def __init__(self):
+
+        super().__init__()
+
+        self.parameters = {}
+
+        self.examples = []
+
+
 
     @property
     @abstractmethod
     def name(self) -> str:
+
         pass
 
 
@@ -21,6 +29,7 @@ class BaseTool(ABC):
     @property
     @abstractmethod
     def description(self) -> str:
+
         pass
 
 
@@ -32,16 +41,37 @@ class BaseTool(ABC):
 
 
 
+    @property
+    def category(self):
+
+        return "general"
+
+
+
     def schema(self):
 
         return {
-            "name": self.name,
-            "description": self.description,
-            "version": self.version,
-            "category": self.category,
-            "parameters": self.parameters,
-            "examples": self.examples
-            }
+
+            "name":
+            self.name,
+
+            "description":
+            self.description,
+
+            "version":
+            self.version,
+
+            "category":
+            self.category,
+
+            "parameters":
+            self.parameters,
+
+            "examples":
+            self.examples
+
+        }
+
 
 
     @abstractmethod

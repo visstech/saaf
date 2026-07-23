@@ -1,6 +1,7 @@
 from saaf.llm import LLMOutputParser
 from saaf.validation.validator import IntentValidator
 from saaf.reasoning.prompt_builder import PromptBuilder
+from saaf.reasoning.capability_matcher import CapabilityMatcher
 
 
 class ReasoningEngine:
@@ -15,14 +16,22 @@ class ReasoningEngine:
     def __init__(
         self,
         llm=None,
-        tools=None
+        tools=None,
+        plugin_registry=None
     ):
 
         self.llm = llm
         self.tools = tools
+        self.plugin_registry = plugin_registry
         self.parser = LLMOutputParser()
         self.validator = IntentValidator()
         self.prompt_builder = PromptBuilder()
+        self.capability_matcher = None
+        if plugin_registry:
+
+            self.capability_matcher = CapabilityMatcher(
+                plugin_registry
+            )
 
 
 
@@ -140,17 +149,10 @@ class ReasoningEngine:
         # Validate Intent
         # -----------------------------
 
-        intent = self.validator.validate(
-            data
-        )
-
-
-        print(
-            "[Validated Intent]",
-            intent
-        )
-
-
+        intent = self.validator.validate(data)
+        print("[Validated Intent]",intent )
+        intent = self.resolve_capability(intent)
+        print("[Resolved Intent]",intent)
         return intent
 
 
@@ -325,3 +327,86 @@ class ReasoningEngine:
             request
 
         }
+    def resolve_capability(
+            self,
+            intent
+        ):
+            """
+            Resolve capability into executable tool.
+
+            Handles unavailable plugins safely.
+            """
+
+
+            if not self.capability_matcher:
+
+                return intent
+
+
+
+            if (
+                intent.capability
+                and not intent.tool
+            ):
+
+
+                plugin = (
+                    self.capability_matcher.resolve(
+                        intent.capability
+                    )
+                )
+
+
+
+                # ----------------------------------
+                # Plugin available
+                # ----------------------------------
+
+                if plugin:
+
+
+                    intent.tool = (
+                        plugin.metadata.name
+                    )
+
+
+                    print(
+                        "[Capability Resolved]",
+                        intent.capability,
+                        "->",
+                        intent.tool
+                    )
+
+
+
+                # ----------------------------------
+                # Plugin unavailable
+                # ----------------------------------
+
+                else:
+
+
+                    print(
+                        "[Capability Unavailable]",
+                        intent.capability
+                    )
+
+
+                    intent.action = (
+                        "plugin_unavailable"
+                    )
+
+
+                    intent.raw = {
+                        **intent.raw,
+
+                        "error":
+                        (
+                            f"No enabled plugin available "
+                            f"for capability '{intent.capability}'"
+                        )
+                    }
+
+
+
+            return intent

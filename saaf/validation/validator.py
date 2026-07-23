@@ -170,6 +170,8 @@ class IntentValidator:
 
         tool = data.get("tool")
 
+        capability = data.get("capability")
+
         tool_input = (
             data.get("input")
             or data.get("city")
@@ -182,6 +184,8 @@ class IntentValidator:
             action=action,
 
             tool=tool,
+
+            capability=capability,
 
             input=tool_input,
 

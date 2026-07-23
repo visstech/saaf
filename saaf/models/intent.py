@@ -27,24 +27,14 @@ class AgentIntent:
     Every LLM response becomes this object.
     """
 
-
     action: str
-
-
     tool: Optional[str] = None
-
-
+    capability: str = None
     input: Optional[str] = None
-
-
     memory_key: Optional[str] = None
-
-
     steps: List[AgentStep] = field(
-        default_factory=list
-    )
-
-
+                default_factory=list
+            )
     raw: Dict = field(
         default_factory=dict
     )

@@ -2,32 +2,24 @@ from saaf.memory.memory_manager import MemoryManager
 from saaf.memory.conversation_memory import ConversationMemory
 from saaf.memory.short_term_memory import ShortTermMemory
 from saaf.memory.long_term_memory import LongTermMemory
-
 from saaf.storage.sqlite_storage import SQLiteStorage
-
 from saaf.reasoning.reasoning_engine import ReasoningEngine
 from saaf.reasoning.planner import Planner
-
-from saaf.tools.tool_manager import ToolManager 
-from saaf.tools.plugin_loader import PluginLoader
-
+from saaf.tools.tool_manager import ToolManager
 from saaf.observer.observer import Observer
-
 from saaf.memory.memory_extractor import MemoryExtractor
 from saaf.llm import (LLMManager, OllamaLLM)
 # Workflow System
 from saaf.workflow.workflow import WorkflowEngine
-from saaf.workflow.registry import WorkflowRegistry
-
-#from saaf.workflow.nodes.calculator_node import CalculatorNode
+from saaf.workflow.registry import WorkflowRegistry 
 from saaf.workflow.nodes.memory_node import MemoryNode
 from saaf.workflow.nodes.tool_node import ToolNode
-
 from saaf.response.formatter_registry import FormatterRegistry
-
 from saaf.response.formatters.calculator_formatter import CalculatorFormatter
 from saaf.response.formatters.weather_formatter import WeatherFormatter
 from saaf.response.formatter_loader import FormatterLoader
+from saaf.plugins.plugin_manager import PluginManager
+
 
 
 
@@ -88,13 +80,18 @@ def create_runtime():
     # Tool Layer
     # =====================================
 
-    tool_manager = ToolManager()
-    
-    plugin_loader = PluginLoader()
+    # -------------------------------------
+    # Plugin Manager
+    # -------------------------------------
 
-    plugins = plugin_loader.load_plugins()
-
-
+    plugin_manager = PluginManager()
+    plugins = plugin_manager.load_plugins()
+    # -------------------------------------
+    # Tool Manager
+    # -------------------------------------
+    tool_manager = ToolManager(
+        plugin_manager=plugin_manager
+    )
     for tool in plugins:
 
         tool_manager.register_tool(
@@ -223,6 +220,7 @@ def create_runtime():
         "registry":
         registry,        
         "llm": llm_manager,
-        "formatter_registry": formatter_registry
+        "formatter_registry": formatter_registry,
+        "plugin_manager": plugin_manager,
 
     }

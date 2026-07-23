@@ -14,15 +14,15 @@ class ToolManager:
     """
 
 
-    def __init__(
-        self,
-        registry=None
-    ):
+    def __init__( self,registry=None,plugin_manager=None):
 
         self.registry = (
             registry
             or ToolRegistry()
         )
+
+        self.plugin_manager = plugin_manager
+        
 
     def tool_schemas(self) -> list[dict]:
         """
@@ -79,27 +79,70 @@ class ToolManager:
 
 
     def execute_tool(
-        self,
-        tool_name: str,
-        query: str
-    ):
+            self,
+            tool_name: str,
+            query: str
+        ):
 
-        tool = self.get_tool(
-            tool_name
-        )
+            # ---------------------------------
+            # Check Plugin Registry
+            # ---------------------------------
 
+            if self.plugin_manager:
 
-        if tool is None:
+                plugin = (
+                    self.plugin_manager
+                    .registry
+                    .get(tool_name)
+                )
 
-            raise ValueError(
-                f"Tool '{tool_name}' not found"
+                if plugin is None:
+
+                    raise ValueError(
+                        f"Plugin '{tool_name}' not found."
+                    )
+
+                if not plugin.enabled:
+
+                    return {
+
+                        "tool": tool_name,
+
+                        "error":
+                        f"Plugin '{tool_name}' is disabled."
+
+                    }
+
+                health = plugin.health_check()
+
+                if not health["healthy"]:
+
+                    return {
+
+                        "tool": tool_name,
+
+                        "error":
+                        f"Plugin '{tool_name}' is unhealthy."
+
+                    }
+
+            # ---------------------------------
+            # Execute Tool
+            # ---------------------------------
+
+            tool = self.get_tool(
+                tool_name
             )
 
+            if tool is None:
 
-        return tool.execute(
-            query
-        )
+                raise ValueError(
+                    f"Tool '{tool_name}' not found"
+                )
 
+            return tool.execute(
+                query
+            )
 
 
     def execute_plan(

@@ -1,15 +1,16 @@
 from saaf.tools.base_tool import BaseTool
-from saaf.plugins.base_plugin import BasePlugin
 from saaf.plugins.metadata import PluginMetadata
 
 
-class WeatherTool(BaseTool,BasePlugin):
+
+class WeatherTool(BaseTool):
     """
     Weather information tool.
 
     Currently a mock implementation.
     Later we can connect real weather APIs.
     """
+
 
 
     name = "weather"
@@ -28,76 +29,96 @@ class WeatherTool(BaseTool,BasePlugin):
 
 
 
+    def __init__(self):
+
+        super().__init__()
+
+        self.parameters = {
+
+            "city":
+            "City name"
+
+        }
+
+
+        self.examples = [
+
+            "weather in Kuala Lumpur",
+
+            "temperature in London",
+
+            "weather forecast for Chennai"
+
+        ]
+
+
+
     @property
     def schema(self):
 
         return {
 
-            "name": self.name,
+            "name":
+            self.name,
 
-            "description": self.description,
+            "description":
+            self.description,
 
-            "version": self.version,
+            "version":
+            self.version,
 
-            "category": self.category,
+            "category":
+            self.category,
 
-            "parameters": {
+            "parameters":
+            self.parameters,
 
-                "city":
-                "City name"
-
-            },
-
-            "examples": [
-
-                "weather in Kuala Lumpur",
-
-                "temperature in London",
-
-                "weather forecast for Chennai"
-
-            ]
+            "examples":
+            self.examples
 
         }
 
+
+
     @property
     def metadata(self):
-    
-            return PluginMetadata(
-    
-                name="weather",
-    
-                version="1.0",
-    
-                description=(
-                    "Provides weather information "
-                    "for a given city."
-                ),
-    
-                category="information",
-    
-                capabilities=[
-    
-                    "weather",
-    
-                    "temperature",
-    
-                    "forecast"
-    
-                ],
-    
-                priority=8,
-    
-                cost="free",
-    
-                requires_network=True,
-    
-                supports_async=False,
-    
-                supports_streaming=False
-    
-            )    
-            
+
+        return PluginMetadata(
+
+            name="weather",
+
+            version="1.0",
+
+            description=(
+                "Provides weather information "
+                "for a given city."
+            ),
+
+            category="information",
+
+            capabilities=[
+
+                "weather",
+
+                "temperature",
+
+                "forecast"
+
+            ],
+
+            priority=8,
+
+            cost="free",
+
+            requires_network=True,
+
+            supports_async=False,
+
+            supports_streaming=False
+
+        )
+
+
 
     def execute(
         self,
@@ -105,31 +126,45 @@ class WeatherTool(BaseTool,BasePlugin):
     ):
 
         if not query:
+
             return {
-                "tool": self.name,
-                "error": "No city provided."
+
+                "tool":
+                self.name,
+
+                "error":
+                "No city provided."
+
             }
+
 
         city = query.strip()
 
 
-        # Mock response
 
         return {
 
-            "tool": self.name,
+            "tool":
+            self.name,
 
-            "input": city,
 
-            "output": {
+            "input":
+            city,
 
-                "city": city,
 
-                "temperature": "32°C",
+            "output":
 
-                "condition": "Sunny"
+            {
+
+                "city":
+                city,
+
+                "temperature":
+                "32°C",
+
+                "condition":
+                "Sunny"
 
             }
 
         }
-    

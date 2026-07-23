@@ -4,7 +4,7 @@ from saaf.plugins.base_plugin import BasePlugin
 from saaf.plugins.metadata import PluginMetadata
 
 
-class CalculatorTool(BaseTool, BasePlugin):
+class CalculatorTool(BaseTool):
     
     name = "calculator"
     description = """

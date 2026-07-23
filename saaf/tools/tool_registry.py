@@ -44,10 +44,29 @@ class ToolRegistry:
 
     def schemas(self):
 
-        return [
+        schemas = []
 
-            tool.schema
 
-            for tool in self.tools.values()
+        for tool in self.tools.values():
 
-        ]
+            schema = tool.schema.copy()
+
+
+            # Add plugin capabilities
+
+            if hasattr(
+                tool,
+                "metadata"
+            ):
+
+                schema["capabilities"] = (
+                    tool.metadata.capabilities
+                )
+
+
+            schemas.append(
+                schema
+            )
+
+
+        return schemas

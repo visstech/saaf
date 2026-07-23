@@ -25,9 +25,9 @@ class Agent:
         tools=None,
         observer=None,
         memory_extractor=None,
-        planner=None,        
+        planner=None,
         workflow=None,
-         formatter_registry=None
+        formatter_registry=None
     ):
 
         self.name = name
@@ -37,26 +37,53 @@ class Agent:
         self.reasoning = reasoning
         self.tools = tools
         self.observer = observer
-        self.workflow = workflow        
+        self.workflow = workflow
         self.formatter_registry = formatter_registry
-        
+
+
         self.response_generator = ResponseGenerator(
             formatter_registry
         )
+
 
         self.memory_extractor = (
             memory_extractor
             or MemoryExtractor()
         )
 
+
         self.planner = planner
+
+
+        # =============================
+        # Plugin System
+        # =============================
+
         self.plugin_manager = PluginManager()
+
         self.plugin_manager.load_plugins()
-       
+
+
+        # Connect plugins to reasoning
+
+        if self.reasoning:
+
+            self.reasoning.plugin_registry = (
+                self.plugin_manager.registry
+            )
+
+
+            self.reasoning.capability_matcher = (
+                self.plugin_manager.router
+            )
 
 
 
-    def run(self, request):
+    def run(
+        self,
+        request
+    ):
+
 
         self.status = "running"
 
@@ -87,7 +114,6 @@ class Agent:
                     extracted_memory
                 )
 
-
                 print(
                     "[Memory Extractor] New memory stored."
                 )
@@ -107,7 +133,7 @@ class Agent:
 
 
         # =============================
-        # Memory Layer
+        # Memory
         # =============================
 
         if self.memory:
@@ -123,6 +149,7 @@ class Agent:
         # =============================
 
         if self.reasoning:
+
 
             print(
                 "[Reasoning] Creating plan..."
@@ -145,28 +172,51 @@ class Agent:
 
 
 
+
         # =============================
-        # Execute Plan
+        # No Plan
         # =============================
 
         if not plan:
 
+
             result = {
+
                 "message":
                 "No plan generated."
+
             }
+
 
 
         else:
 
 
-            if isinstance(plan, dict):
+            action = (
+                plan.action
+                if hasattr(plan,"action")
+                else plan.get("action")
+            )
 
-                action = plan.get("action")
 
-            else:
 
-                action = plan.action
+            # =============================
+            # Plugin unavailable
+            # =============================
+
+            if action == "plugin_unavailable":
+
+
+                result = {
+
+                    "message":
+                    (
+                        f"The capability "
+                        f"'{plan.capability}' "
+                        f"is currently unavailable."
+                    )
+
+                }
 
 
 
@@ -174,7 +224,7 @@ class Agent:
             # Memory Saved
             # =============================
 
-            if action == "memory_saved":
+            elif action == "memory_saved":
 
 
                 result = {
@@ -187,7 +237,7 @@ class Agent:
 
 
             # =============================
-            # TOOL / WORKFLOW
+            # Tool / Workflow
             # =============================
 
             elif action in [
@@ -198,12 +248,14 @@ class Agent:
 
                 if not self.planner or not self.workflow:
 
+
                     result = {
 
                         "message":
                         "Workflow not available."
 
                     }
+
 
 
                 else:
@@ -230,11 +282,17 @@ class Agent:
                         "[workflow] Executing..."
                     )
 
+
+
                     state = WorkflowState(
-                            user_id="default",
-                            request=request
-                        )
-                    
+
+                        user_id="default",
+
+                        request=request
+
+                    )
+
+
                     context = (
                         self.workflow.run(
                             execution_plan,
@@ -244,22 +302,20 @@ class Agent:
 
 
                     print(
-                        "[Workflow  Output]",
+                        "[Workflow Output]",
                         context
                     )
 
 
 
-                    # -------------------------
                     # Store calculator result
-                    # -------------------------
 
                     for item in context.results:
 
 
                         if (
 
-                            isinstance(item, dict)
+                            isinstance(item,dict)
 
                             and item.get("tool")
                             == "calculator"
@@ -292,81 +348,75 @@ class Agent:
                             )
 
 
-                            self.memory.remember(
-                                memory
-                            )
+                            if self.memory:
+
+                                self.memory.remember(
+                                    memory
+                                )
 
 
-                            print(
-                                "[Memory] Stored calculation."
-                            )
+                                print(
+                                    "[Memory] Stored calculation."
+                                )
 
 
 
-                    # -------------------------
-                    # Final result
-                    # -------------------------
+                    result = (
 
-                    if context.results:
+                        context.results
 
-                        result = context.results
+                        if context.results
 
-
-                    else:
-
-                        result = {
+                        else {
 
                             "message":
                             "Execution returned no result."
 
                         }
 
-
+                    )
 
 
 
             # =============================
-            # MEMORY SEARCH
+            # Memory Recall
             # =============================
 
             elif action == "memory":
-
-
-                print(
-                    "[Memory] Searching..."
-                )
 
 
                 memory = self.memory.recall(
 
                     "default",
 
-                    plan["memory_key"]
+                    plan.memory_key
 
                 )
 
 
-                if memory:
+                result = (
 
-                    result = memory
+                    memory
 
+                    if memory
 
-                else:
-
-                    result = {
+                    else {
 
                         "message":
                         "I don't remember anything."
 
                     }
 
+                )
+
 
 
             # =============================
-            # UNKNOWN
+            # Unknown
             # =============================
 
             else:
+
 
                 result = {
 
@@ -378,6 +428,7 @@ class Agent:
 
 
         self.status = "completed"
+
 
 
         return self.response_generator.generate(
