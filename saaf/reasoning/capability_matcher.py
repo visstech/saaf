@@ -2,6 +2,8 @@ class CapabilityMatcher:
     """
     Finds the best plugin based on
     required capability.
+
+    Health aware capability resolver.
     """
 
 
@@ -14,17 +16,19 @@ class CapabilityMatcher:
 
 
 
+    # ==================================================
+    # Find Plugin
+    # ==================================================
+
     def find_tool(
         self,
         capability: str
     ):
         """
-        Existing compatibility method.
-
-        Returns:
-            Plugin instance
-            or None
+        Returns the best available
+        healthy plugin.
         """
+
 
         plugins = (
             self.registry.find_by_capability(
@@ -39,15 +43,52 @@ class CapabilityMatcher:
 
 
 
-        # Choose highest priority plugin
+        # --------------------------------
+        # Filter enabled + healthy plugins
+        # --------------------------------
+
+        available_plugins = [
+
+            plugin
+
+            for plugin in plugins
+
+            if plugin.enabled
+
+            and plugin.health_check().get(
+                "healthy",
+                False
+            )
+
+        ]
+
+
+
+        if not available_plugins:
+
+            return None
+
+
+
+        # --------------------------------
+        # Highest priority selection
+        # --------------------------------
 
         best_plugin = max(
 
-            plugins,
+            available_plugins,
 
             key=lambda plugin:
-            plugin.metadata.priority
+                plugin.metadata.priority
 
+        )
+
+
+        print(
+            "[Capability Matcher]",
+            capability,
+            "->",
+            best_plugin.metadata.name
         )
 
 
@@ -56,6 +97,10 @@ class CapabilityMatcher:
 
 
 
+    # ==================================================
+    # Resolve Capability
+    # ==================================================
+
     def resolve(
         self,
         capability: str
@@ -63,8 +108,7 @@ class CapabilityMatcher:
         """
         Intelligent capability resolution.
 
-        Returns information about
-        capability availability.
+        Returns capability status.
         """
 
 
@@ -73,11 +117,19 @@ class CapabilityMatcher:
         )
 
 
+
         # --------------------------------
-        # Capability unavailable
+        # No healthy plugin
         # --------------------------------
 
         if plugin is None:
+
+
+            print(
+                "[Capability Matcher]",
+                capability,
+                "-> unavailable"
+            )
 
 
             return {
@@ -89,14 +141,14 @@ class CapabilityMatcher:
                 "tool": None,
 
                 "reason":
-                "No enabled plugin supports this capability."
+                "No enabled healthy plugin supports this capability."
 
             }
 
 
 
         # --------------------------------
-        # Capability available
+        # Available
         # --------------------------------
 
         return {

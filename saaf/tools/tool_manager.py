@@ -2,6 +2,7 @@ from typing import Optional
 
 from saaf.tools.base_tool import BaseTool
 from saaf.tools.tool_registry import ToolRegistry
+import time
 
 
 
@@ -84,55 +85,7 @@ class ToolManager:
             query: str
         ):
 
-            # ---------------------------------
-            # Check Plugin Registry
-            # ---------------------------------
-
-            if self.plugin_manager:
-
-                plugin = (
-                    self.plugin_manager
-                    .registry
-                    .get(tool_name)
-                )
-
-                if plugin is None:
-
-                    raise ValueError(
-                        f"Plugin '{tool_name}' not found."
-                    )
-
-                if not plugin.enabled:
-
-                    return {
-
-                        "tool": tool_name,
-
-                        "error":
-                        f"Plugin '{tool_name}' is disabled."
-
-                    }
-
-                health = plugin.health_check()
-
-                if not health["healthy"]:
-
-                    return {
-
-                        "tool": tool_name,
-
-                        "error":
-                        f"Plugin '{tool_name}' is unhealthy."
-
-                    }
-
-            # ---------------------------------
-            # Execute Tool
-            # ---------------------------------
-
-            tool = self.get_tool(
-                tool_name
-            )
+            tool = self.get_tool(tool_name)
 
             if tool is None:
 
@@ -140,10 +93,30 @@ class ToolManager:
                     f"Tool '{tool_name}' not found"
                 )
 
-            return tool.execute(
-                query
-            )
+            start = time.perf_counter()
 
+            try:
+
+                result = tool.execute(query)
+
+                elapsed = (
+                    time.perf_counter()
+                    - start
+                )
+
+                tool.health.record_success(
+                    elapsed
+                )
+
+                return result
+
+            except Exception as ex:
+
+                tool.health.record_failure(
+                    str(ex)
+                )
+
+                raise
 
     def execute_plan(
         self,

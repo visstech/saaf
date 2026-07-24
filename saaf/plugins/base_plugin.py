@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from saaf.plugins.metadata import PluginMetadata
+from saaf.plugins.plugin_health import PluginHealth
 
 
 
@@ -11,10 +12,12 @@ class BasePlugin(ABC):
 
 
     def __init__(self):
-
+        
+        
         self.enabled = True
 
         self.status = "initialized"
+        self.health = PluginHealth()
 
 
 
@@ -82,6 +85,7 @@ class BasePlugin(ABC):
         self.enabled = True
 
         self.status = "active"
+        self.health.enabled = True
 
 
 
@@ -90,6 +94,7 @@ class BasePlugin(ABC):
         self.enabled = False
 
         self.status = "disabled"
+        self.health.enabled = False
 
 
 
@@ -101,27 +106,29 @@ class BasePlugin(ABC):
 
     def health_check(self):
 
-        """
-        Basic plugin health check.
-        Child plugins can override.
-        """
+            return {
 
-        return {
+                "name": self.metadata.name,
 
-            "name":
-            self.metadata.name,
+                "status": self.status,
 
-            "status":
-            self.status,
+                "enabled": self.enabled,
 
-            "enabled":
-            self.enabled,
+                "healthy": self.health.healthy,
 
-            "healthy":
-            True
+                "success_count": self.health.success_count,
 
-        }
+                "failure_count": self.health.failure_count,
 
+                "average_response_time":
+                    round(
+                        self.health.average_response_time,
+                        4
+                    ),
+
+                "last_error": self.health.last_error
+
+            }
 
 
     def initialize(self):
@@ -131,3 +138,4 @@ class BasePlugin(ABC):
         """
 
         self.status = "active"
+        self.health.enabled = True
